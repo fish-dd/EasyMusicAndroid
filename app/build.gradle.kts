@@ -11,8 +11,8 @@ android {
         applicationId = "com.platon.easymusicandroid"
         minSdk = 23
         targetSdk = 34
-        versionCode = 4
-        versionName = "2.0"
+        versionCode = 5
+        versionName = "2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -64,4 +64,5 @@ dependencies {
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.material.icons.extended)
+    //implementation(libs.androidx.room.runtime)
 }

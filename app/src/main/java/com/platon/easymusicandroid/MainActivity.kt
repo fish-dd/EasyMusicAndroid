@@ -7,7 +7,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,8 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.android.exoplayer2.ExoPlayer
@@ -32,23 +29,21 @@ import com.google.android.exoplayer2.MediaItem
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.ui.focus.focusModifier
+import androidx.compose.foundation.Image
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.pager.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.geometry.times
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontVariation
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.lerp
-import androidx.compose.ui.unit.times
 import kotlin.math.*
 
 data class Station(
@@ -118,8 +113,7 @@ class MainActivity : ComponentActivity() {
                     if (isPlaying.value) {
                         player.pause()
                         isPlaying.value = false
-                    }
-                    else {
+                    } else {
                         playStation(stations[currentStationIndex.value])
                         isPlaying.value = true
                     }
@@ -190,6 +184,7 @@ fun MusicUI(
 
     val context = LocalContext.current
     val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/easymusicplatonoferon/")) }
+    var zazu by remember { mutableStateOf(false) }
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
@@ -203,7 +198,9 @@ fun MusicUI(
         sheetContainerColor = Color(0xff1f1f1f),
         sheetContent = {
             Column(
-                modifier = Modifier.fillMaxWidth().height(300.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(284.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
@@ -224,32 +221,75 @@ fun MusicUI(
                         modifier = Modifier.size(36.dp)
                     )
                 }
-                Spacer(modifier = Modifier.height(72.dp))
-                Button(
-                    onClick = {
-                        try {
-                            context.startActivity(intent)
-                        }
-                        catch (e: Exception) {
-                            Toast.makeText(context, "Ошибка. Ищи вручную:\n@easymusicplatonoferon", Toast.LENGTH_LONG).show()
-                        }
-                    },
-                    colors = ButtonColors(
-                        Color.White,
-                        Color(0xff1f1f1f),
-                        Color.White,
-                        Color(0xff1f1f1f)
-                    )
+                Spacer(modifier = Modifier.height(56.dp))
+                Box(
+                    modifier = Modifier
+                        .padding(32.dp)
+                        .fillMaxWidth()
                 ) {
-                    Text(
-                        text = "ТГ чат",
-                        color = Color(0xff1f1f1f)
-                    )
+                    IconButton(
+                        onClick = {
+                            zazu = !zazu
+                            if (zazu) Toast.makeText(context, "Шикарно", Toast.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Pets,
+                            contentDescription = "Settings",
+                            tint = Color.White,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            try {
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "Ошибка. Ищи вручную:\n@easymusicplatonoferon",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        },
+                        colors = ButtonColors(
+                            Color.White,
+                            Color(0xff1f1f1f),
+                            Color.White,
+                            Color(0xff1f1f1f)
+                        ),
+                        modifier = Modifier.align(Alignment.Center)
+                    ) {
+                        Text(
+                            text = "ТГ чат",
+                            color = Color(0xff1f1f1f)
+                        )
+                    }
+                    IconButton(
+                        onClick = {},
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Settings",
+                            tint = Color.White,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
                 }
             }
         },
         sheetPeekHeight = 200.dp
     ) {
+        if (zazu) {
+            Image(
+                painter = painterResource(R.drawable.zazu),
+                contentDescription = "Zazu",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
         Box {
             VerticalPager(
                 state = pagerState,
@@ -269,10 +309,13 @@ fun MusicUI(
                             .fillMaxWidth()
                             .graphicsLayer {
                                 if (pagerState.offsetForPage(page) >= 0) {
-                                    translationY = pagerState.offsetForPage(page) * (pagerState.layoutInfo.pageSize - 40.sp.toPx() - 4.dp.toPx())
-                                }
-                                else {
-                                    translationY = minOf(0f, pagerState.offsetForPage(page) + 1f) * (pagerState.layoutInfo.pageSize - 40.sp.toPx() - 4.dp.toPx())
+                                    translationY =
+                                        pagerState.offsetForPage(page) * (pagerState.layoutInfo.pageSize - 40.sp.toPx() - 4.dp.toPx())
+                                } else {
+                                    translationY = minOf(
+                                        0f,
+                                        pagerState.offsetForPage(page) + 1f
+                                    ) * (pagerState.layoutInfo.pageSize - 40.sp.toPx() - 4.dp.toPx())
                                 }
                             }
                             .alpha(maxOf(0f, (1f - abs(pagerState.offsetForPage(page))) / 2) + 0.5f)
@@ -286,10 +329,13 @@ fun MusicUI(
                             .fillMaxWidth()
                             .graphicsLayer {
                                 if (pagerState.offsetForPage(page) >= 0) {
-                                    translationY = pagerState.offsetForPage(page) * (pagerState.layoutInfo.pageSize - 40.sp.toPx() - 4.dp.toPx())
-                                }
-                                else {
-                                    translationY = minOf(0f, pagerState.offsetForPage(page) + 1f) * (pagerState.layoutInfo.pageSize - 40.sp.toPx() - 4.dp.toPx())
+                                    translationY =
+                                        pagerState.offsetForPage(page) * (pagerState.layoutInfo.pageSize - 40.sp.toPx() - 4.dp.toPx())
+                                } else {
+                                    translationY = minOf(
+                                        0f,
+                                        pagerState.offsetForPage(page) + 1f
+                                    ) * (pagerState.layoutInfo.pageSize - 40.sp.toPx() - 4.dp.toPx())
                                 }
                             }
                             .alpha(maxOf(0f, 1f - abs(pagerState.offsetForPage(page))))
